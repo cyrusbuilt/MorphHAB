@@ -1,0 +1,187 @@
+Const #K_BYTE_DIVIDER = 256
+
+Global MQTTLib = {}
+MQTTLib.VERSION = "1.0.0"
+MQTTLib.DebugMode = True
+MQTTLib.Net = {}
+MQTTLib.NET.PushableItem = {}
+MQTTLib.Net.Stack = {}
+MQTTLib.Net.Queue = {}
+MQTTLib.Net.RawConnection = {}
+
+Function MQTTLib.GetUInt16BinaryString(length)
+	Return (ByteChr(length \ #K_BYTE_DIVIDER) .. ByteChr(length % #K_BYTE_DIVIDER))
+EndFunction
+
+Function MQTTLib.GetMQTTRawString(inStr)
+	Return (MQTTLib.GetUInt16BinaryString(ByteLen(inStr)) .. 
+EndFunction
+
+MQTTLib.Net.PushableItem._nextPushableHook = {}
+
+Function MQTTLib.Net.PushableItem:New()
+	Return (CopyTable(self))
+EndFunction
+
+Function MQTTLib.Net.PushableItem:GetNextItem()
+	Return (self._nextPushableHook)
+EndFunction
+
+Function MQTTLib.Net.PushableItem.SetNextItem(item)
+	self._nextPushableHook = item
+EndFunction
+
+MQTTLib.Net.Stack._firstItem = {}
+MQTTLib.Net.Stack._maxSize = 0
+MQTTLib.Net.Stack._size = 0
+
+Function MQTTLib.Net.Stack:New(maxSize)
+	If IsNil(maxSize) Then maxSize = 0
+	Local instance = CopyTable(self)
+	instance._maxSize = maxSize
+	Return (instance)
+EndFunction
+
+Function MQTTLib.Net.Stack:IsEmpty()
+	Return (IsNil(self._firstItem))
+EndFunction
+
+Function MQTTLib.Net.Stack:GetMaxSize()
+	Return (self._maxSize)
+EndFunction
+
+Function MQTTLib.Net.Stack:GetSize()
+	Return (self._size)
+EndFunction
+
+Function MQTTLib.Net.Stack:Pop()
+	If GetType(self._firstItem) <> #TABLE
+		; TODO throw error?
+	EndIf
+	
+	If Not HaveItem(self._firstItem, "GetNextItem") Or Not HaveItem(self._firstItem, "SetNextItem")
+		; TODO throw error?
+	EndIf
+	
+	Local theResult = self._firstItem
+	self._firstItem = theResult:GetNextItem()
+	
+	; Break the link to avoid memory leaks
+	theResult:SetNextItem(Nil)
+	
+	; Adjust size count and return the popped item
+	self._size = self._size - 1
+	Return (theResult)
+EndFunction
+
+Function MQTTLib.Net.Stack:ClearAll()
+	Repeat
+		self:Pop()
+	Until self:IsEmpty()
+EndFunction
+
+Function MQTTLib.Net.Stack:Push(item)
+	If GetType(item) <> #TABLE
+		; TODO throw error?
+	EndIf
+	
+	If Not HaveItem(item, "GetNextItem") Or Not HaveItem(item, "SetNextItem")
+		; TODO throw error?
+	EndIf
+	
+	If self._maxSize > 0 And self._size = self._maxSize
+		; TODO throw error
+	EndIf
+	
+	; Push new item on top of the stack
+	item:SetNextItem(self._firstItem)
+	self._firstItem = item
+	self._size = self._size + 1
+EndFunction
+
+MQTTLib.Net.Queue._size = 0
+MQTTLib.Net.Queue._maxSize = 0
+MQTTLib.Net.Queue._lastItem = {}
+MQTTLib.Net.Queue._firstItem = {}
+
+Function MQTTLib.Net.Queue:New(maxSize)
+	If IsNil(maxSize) Then maxSize = 0
+	Local instance = CopyTable(self)
+	instance._maxSize = maxSize
+	Return (instance)
+EndFunction
+
+Function MQTTLib.Net.Queue:GetSize()
+	Return (self._size)
+EndFunction
+
+Function MQTTLib.Net.Queue:IsEmpty()
+	Return (IsNil(self._lastItem))
+EndFunction
+
+Function MQTTLib.Net.Queue:GetMaxSize()
+	Return (self._maxSize)
+EndFunction
+
+Function MQTTLib.Net.Queue:Dequeue()
+	If GetType(self._lastItem) <> #TABLE
+		; TODO throw error?
+	EndIf
+	
+	If Not HaveItem(item, "GetNextItem") Or Not HaveItem(item, "SetNextItem")
+		; TODO throw error?
+	EndIf
+	
+	; Unhook the outgoing item and hook up the item next to it.
+	Local theItem = self._lastItem
+	self._firstItem = theItem:GetNextItem()
+	
+	; If the queue is now empty, Nil the last item's hook
+	If IsNil(theItem:GetNextItem())
+		self._lastItem = Nil
+	EndIf
+	
+	; Decrement the items count
+	self._size = self._size - 1
+	
+	; Break the link to its next item to avoid potential memory leaks
+	theItem:SetNextItem(Nil)
+	
+	; Return the outgoing item
+	Return (theItem)
+EndFunction
+
+Function MQTTLib.Net.Queue:ClearAll()
+	Repeat
+		self:Dequeue()
+	Until self:IsEmpty()
+EndFunction
+
+Function MQTTLib.Net.Queue:Enqueue(item)
+	If GetType(item) <> #table
+		; TODO throw error?
+	EndIf
+	
+	If Not HaveItem(item, "GetNextItem") Or Not HaveItem(item, "SetNextItem")
+		; TODO throw error?
+	EndIf
+	
+	If self._maxSize > 0 And self._size = self._maxSize
+		; TODO throw queue full error?
+	EndIf
+	
+	; Is there any other item in the queue?
+	If IsNil(self._firstItem)
+		; No other item, so this is the next to go out.
+		self._firstItem = item
+	Else
+		; Hook up the new item to the last one in the queue
+		self._lastItem:SetNextItem(item)
+	EndIf
+	
+	; Set the new item as the last item
+	self._lastItem = item
+	
+	; Increment the items count
+	self._size = self._size + 1
+EndIf

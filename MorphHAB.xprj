@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<FlowStudioProjectFile>
+    <FileVersion major="0" minor="1"/>
+    <Project>
+        <Option projectname="MorphHAB"/>
+        <Option autosave="1"/>
+        <Option buildcommand="Hollywood:System/Hollywood -debugdevice @stdout MorphHAB.hws"/>
+        <Option makefile="Makefile"/>
+        <Option manualmakefile="2"/>
+        <Option quietoutput="1"/>
+        <Option cvscommand="gg:bin/cvs"/>
+        <Option defaulttarget="RELEASE"/>
+        <Option activetarget="RELEASE"/>
+        <Option crossbuild="0"/>
+        <Option crossserver=""/>
+        <Option crosslogin=""/>
+        <Option crossdir=""/>
+        <Target name="RELEASE">
+            <Option type="2"/>
+            <Option execfile="MorphHAB"/>
+            <Option execdir=""/>
+            <Option objectsdir=""/>
+            <Option arguments=""/>
+            <Option depsfile=""/>
+            <Option autodeps="1"/>
+            <Option customcompiler="0"/>
+            <Option customlinker="0"/>
+        </Target>
+        <Target name="DEBUG">
+            <Option type="2"/>
+            <Option execfile="MorphHAB_DEBUG"/>
+            <Option execdir=""/>
+            <Option objectsdir=""/>
+            <Option arguments=""/>
+            <Option depsfile=""/>
+            <Option autodeps="1"/>
+            <Option customcompiler="1"/>
+            <Option customlinker="1"/>
+            <CompilerSettings>
+                <Option cc_predefined="0"/>
+                <Option cc="ppc-morphos-gcc"/>
+                <Option cflags="-g -O0"/>
+                <Option cincludes=""/>
+                <Option cdefines=""/>
+                <Option cxx_predefined="0"/>
+                <Option cxx="ppc-morphos-g++"/>
+                <Option cppflags="-g -O0"/>
+                <Option cppincludes=""/>
+                <Option cppdefines=""/>
+                <Option objcc_predefined="8"/>
+                <Option objcc="ppc-morphos-clang"/>
+                <Option objcflags="-fobjc-runtime=objfw -fconstant-string-class=OBConstantString -g -O0"/>
+                <Option objcincludes="-I/SDK/Frameworks/include"/>
+                <Option objcdefines=""/>
+            </CompilerSettings>
+            <LinkerSettings>
+                <Option linkerpath=""/>
+                <Option linkerflags=""/>
+                <Option linkerlibraries=""/>
+            </LinkerSettings>
+        </Target>
+        <LinkerSettings>
+            <Option linkerpath=""/>
+            <Option linkerflags=""/>
+            <Option linkerlibraries=""/>
+        </LinkerSettings>
+        <CompilerSettings>
+            <Option cc_predefined="0"/>
+            <Option cc="ppc-morphos-gcc"/>
+            <Option cflags=""/>
+            <Option cincludes=""/>
+            <Option cdefines=""/>
+            <Option cxx_predefined="0"/>
+            <Option cxx="ppc-morphos-g++"/>
+            <Option cppflags=""/>
+            <Option cppincludes=""/>
+            <Option cppdefines=""/>
+            <Option objcc_predefined="8"/>
+            <Option objcc="ppc-morphos-clang"/>
+            <Option objcflags="-fobjc-runtime=objfw -fconstant-string-class=OBConstantString"/>
+            <Option objcincludes="-I/SDK/Frameworks/include"/>
+            <Option objcdefines=""/>
+        </CompilerSettings>
+        <FileUnit filepath="////System/Applications/FlowStudio">
+            <Option inproject="1"/>
+            <Option filetype="16"/>
+        </FileUnit>
+        <FileUnit filepath="MQTTLib.hws">
+            <Option inproject="1"/>
+            <Option filetype="16"/>
+        </FileUnit>
+    </Project>
+</FlowStudioProjectFile>
